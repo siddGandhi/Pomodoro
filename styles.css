@@ -163,20 +163,20 @@ button:active {
 
 /* Distinctive tile configurations */
 .tile-success {
-    background-image: url('frog2.png');
+    background-image: url('frog2.PNG');
     background-color: transparent;
     /* Lilypad green backing glow */
 }
 
 .tile-ff {
-    background-image: url('frog1.png');
+    background-image: url('frog1.PNG');
     /* Replace with your path */
     background-color: transparent;
     /* Warning yellow tint */
 }
 
 .tile-abandoned {
-    background-image: url('frog0.png');
+    background-image: url('frog0.PNG');
     /* Replace with your path */
     background-color: transparent;
     /* Soft red tint */
