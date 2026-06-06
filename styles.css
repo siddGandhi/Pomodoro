@@ -1,0 +1,183 @@
+/* styles.css */
+
+:root {
+    --bg-color: #e0f2fe;
+    /* Light, refreshing water blue */
+    --card-bg: #f0fdf4;
+    /* Soft lilypad-tinted white for the card */
+    --text-color: #166534;
+    /* Deep forest green for readable text */
+    --study-color: #be185d;
+    /* Rich, darker pink/berry to pop against light backgrounds */
+    --break-color: #22c55e;
+    /* Bright lilypad green for rest states */
+    --button-bg: #bbf7d0;
+    /* Light green for secondary buttons */
+    --button-hover: #86efac;
+    /* Darker green shift on hover */
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.timer-container {
+    background-color: var(--card-bg);
+    padding: 2.5rem;
+    border-radius: 24px;
+    /* Soft, natural shadows that look elegant on a light background */
+    box-shadow: 0 0 50px 35px var(--bg-color), 0 20px 40px rgba(22, 101, 52, 0.12);
+    text-align: center;
+    width: 340px;
+    position: relative;
+    z-index: 10;
+    border: 2px solid #bbf7d0;
+    /* Subtle boundary outline for the card */
+}
+
+.timer-container.alarm-active {
+    animation: pulse-bg 1.5s infinite;
+}
+
+@keyframes pulse-bg {
+    0% {
+        box-shadow: 0 0 50px 35px var(--bg-color), 0 20px 40px rgba(190, 24, 93, 0.2);
+    }
+
+    50% {
+        box-shadow: 0 0 50px 35px var(--bg-color), 0 20px 40px rgba(190, 24, 93, 0.5);
+    }
+
+    100% {
+        box-shadow: 0 0 50px 35px var(--bg-color), 0 20px 40px rgba(190, 24, 93, 0.2);
+    }
+}
+
+#status {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.study-mode {
+    color: var(--study-color);
+}
+
+.break-mode {
+    color: var(--break-color);
+}
+
+#timer {
+    font-size: 4.5rem;
+    font-weight: 800;
+    margin: 0.5rem 0 1.5rem 0;
+    color: var(--text-color);
+    font-variant-numeric: tabular-nums;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 0;
+}
+
+button {
+    background-color: var(--button-bg);
+    color: var(--text-color);
+    border: none;
+    padding: 0.8rem 1.2rem;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+button:hover {
+    background-color: var(--button-hover);
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+#startPauseBtn {
+    background-color: var(--study-color);
+    color: #ffffff;
+    /* White text so the dark pink button stays highly readable */
+    flex: 2;
+}
+
+#ffBtn {
+    padding: 0.8rem;
+}
+
+#ffBtn svg {
+    fill: var(--text-color);
+}
+
+#bgCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+    grid-auto-rows: 85px;
+    gap: 12px;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    pointer-events: none;
+}
+
+/* Base style for individual background mosaic elements */
+.session-tile {
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
+    opacity: 1.0;
+    /* Force 100% full crisp color visibility */
+    background-size: cover;
+    /* Stretches the image to fit the 85x85 box perfectly */
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: transform 0.3s ease;
+}
+
+/* Distinctive tile configurations */
+.tile-success {
+    background-image: url('frog2.png');
+    background-color: transparent;
+    /* Lilypad green backing glow */
+}
+
+.tile-ff {
+    background-image: url('frog1.png');
+    /* Replace with your path */
+    background-color: transparent;
+    /* Warning yellow tint */
+}
+
+.tile-abandoned {
+    background-image: url('frog0.png');
+    /* Replace with your path */
+    background-color: transparent;
+    /* Soft red tint */
+}
