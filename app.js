@@ -2,7 +2,7 @@
 import { db } from "./firebase-config.js";
 import { collection, doc, setDoc, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
-const STUDY_TIME = 25 * 60; // 6 seconds for quick testing
+const STUDY_TIME = 0.1 * 60; // 6 seconds for quick testing
 const BREAK_TIME = 5 * 60;
 
 let timeLeft = STUDY_TIME;
@@ -33,11 +33,28 @@ function renderTileToBackground(statusValue) {
     const tile = document.createElement('div');
     tile.classList.add('session-tile');
 
-    if (statusValue === 2) tile.classList.add('tile-success');
-    else if (statusValue === 1) tile.classList.add('tile-ff');
-    else if (statusValue === 0) tile.classList.add('tile-abandoned');
+    if (statusValue === 2) {
+        tile.classList.add('tile-success');
+        // DIAGNOSTIC LOG: Print out what status is rendering
+        console.log("🐸 Success tile generated! Looking for image specified under '.tile-success' in styles.css");
+    }
+    else if (statusValue === 1) {
+        tile.classList.add('tile-ff');
+        console.log("Fast-forward tile generated!");
+    }
+    else if (statusValue === 0) {
+        tile.classList.add('tile-abandoned');
+        console.log("Abandoned tile generated!");
+    }
 
+    // Append the element to the DOM canvas
     bgCanvas.appendChild(tile);
+
+    // DIAGNOSTIC LOG: Test what computed styles the browser is ACTUALLY applying to this new element
+    setTimeout(() => {
+        const computedStyle = window.getComputedStyle(tile);
+        console.log("🔍 [TILE CHECK] Real Browser Image Path Applied:", computedStyle.backgroundImage);
+    }, 100);
 }
 
 // Fetch individual data points on load
@@ -47,7 +64,6 @@ async function loadDailyGrid() {
 
     const q = query(
         collection(db, "pomodoro"),
-        where("date", "==", todayStr),
         orderBy("timestamp", "asc")
     );
 
