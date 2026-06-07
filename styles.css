@@ -177,7 +177,11 @@ button:active {
 
 .tile-abandoned {
     background-image: url('frog0.PNG');
-    /* Replace with your path */
     background-color: transparent;
-    /* Soft red tint */
+}
+
+.tile-paused {
+    background-image: url('frog3.PNG');
+    background-color: rgba(59, 130, 246, 0.15);
+    border: 2px solid #3b82f6;
 }

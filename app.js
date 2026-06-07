@@ -33,28 +33,12 @@ function renderTileToBackground(statusValue) {
     const tile = document.createElement('div');
     tile.classList.add('session-tile');
 
-    if (statusValue === 2) {
-        tile.classList.add('tile-success');
-        // DIAGNOSTIC LOG: Print out what status is rendering
-        console.log("🐸 Success tile generated! Looking for image specified under '.tile-success' in styles.css");
-    }
-    else if (statusValue === 1) {
-        tile.classList.add('tile-ff');
-        console.log("Fast-forward tile generated!");
-    }
-    else if (statusValue === 0) {
-        tile.classList.add('tile-abandoned');
-        console.log("Abandoned tile generated!");
-    }
+    if (statusValue === 2) tile.classList.add('tile-success');
+    else if (statusValue === 1) tile.classList.add('tile-ff');
+    else if (statusValue === 0) tile.classList.add('tile-abandoned');
+    else if (statusValue === 3) tile.classList.add('tile-paused'); // Added for pause status
 
-    // Append the element to the DOM canvas
     bgCanvas.appendChild(tile);
-
-    // DIAGNOSTIC LOG: Test what computed styles the browser is ACTUALLY applying to this new element
-    setTimeout(() => {
-        const computedStyle = window.getComputedStyle(tile);
-        console.log("🔍 [TILE CHECK] Real Browser Image Path Applied:", computedStyle.backgroundImage);
-    }, 100);
 }
 
 // Fetch individual data points on load
@@ -176,10 +160,20 @@ function startTimer() {
     }, 1000);
 }
 
-function pauseTimer() {
+async function pauseTimer() {
     isRunning = false;
     clearInterval(timerId);
     startPauseBtn.textContent = isStudyMode ? "Start Focus" : "Start Rest";
+
+    // NEW LOGIC: If we are pausing an active study block, log it as status 3
+    if (isStudyMode && currentSessionId) {
+        try {
+            await logSessionEvent(3, currentSessionId);
+            await loadDailyGrid();
+        } catch (err) {
+            console.error("Failed to log pause status to Firebase:", err);
+        }
+    }
 }
 
 // Fast Forward Handling
