@@ -1,5 +1,6 @@
-/* styles.css */
-
+/* ==========================================================================
+   1. VARIABLES & BASE RESETS
+   ========================================================================== */
 :root {
     --bg-color: #e0f2fe;
     /* Light, refreshing water blue */
@@ -28,42 +29,34 @@ body {
     margin: 0;
 }
 
+/* ==========================================================================
+   2. TIMER CARD CONTAINER & MAIN LAYOUT ROW
+   ========================================================================== */
 .timer-container {
     background-color: var(--card-bg);
     padding: 2.5rem;
     border-radius: 24px;
-    /* Soft, natural shadows that look elegant on a light background */
     box-shadow: 0 0 50px 35px var(--bg-color), 0 20px 40px rgba(22, 101, 52, 0.12);
     text-align: center;
-    width: 340px;
+    width: 440px;
+    /* Widen container to hold horizontal components comfortably */
     position: relative;
     z-index: 10;
     border: 2px solid #bbf7d0;
-    /* Subtle boundary outline for the card */
 }
 
-.timer-container.alarm-active {
-    animation: pulse-bg 1.5s infinite;
-}
-
-@keyframes pulse-bg {
-    0% {
-        box-shadow: 0 0 50px 35px var(--bg-color), 0 20px 40px rgba(190, 24, 93, 0.2);
-    }
-
-    50% {
-        box-shadow: 0 0 50px 35px var(--bg-color), 0 20px 40px rgba(190, 24, 93, 0.5);
-    }
-
-    100% {
-        box-shadow: 0 0 50px 35px var(--bg-color), 0 20px 40px rgba(190, 24, 93, 0.2);
-    }
+/* Structural wrapper grouping clock and controls panel side-by-side */
+.timer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-top: 1rem;
 }
 
 #status {
     font-size: 1.4rem;
     font-weight: 700;
-    margin-bottom: 0.5rem;
     letter-spacing: 1.5px;
     text-transform: uppercase;
 }
@@ -79,24 +72,47 @@ body {
 #timer {
     font-size: 4.5rem;
     font-weight: 800;
-    margin: 0.5rem 0 1.5rem 0;
+    margin: 0;
+    /* Aligns squarely with the right-side vertical buttons */
     color: var(--text-color);
     font-variant-numeric: tabular-nums;
+    line-height: 1;
 }
 
+/* Card alarming visual feedback loop */
+.timer-container.alarm-active {
+    animation: pulse-bg 1.5s infinite;
+}
+
+@keyframes pulse-bg {
+
+    0%,
+    100% {
+        box-shadow: 0 0 50px 35px var(--bg-color), 0 20px 40px rgba(190, 24, 93, 0.2);
+    }
+
+    50% {
+        box-shadow: 0 0 50px 35px var(--bg-color), 0 20px 40px rgba(190, 24, 93, 0.5);
+    }
+}
+
+/* ==========================================================================
+   3. INTERACTIVE BUTTON INTERFACE
+   ========================================================================== */
 .controls {
     display: flex;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 0;
+    flex-direction: column;
+    gap: 8px;
+    width: 110px;
+    /* Slimmed down slightly since the big start button left the column */
 }
 
 button {
     background-color: var(--button-bg);
     color: var(--text-color);
     border: none;
-    padding: 0.8rem 1.2rem;
-    font-size: 1rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
     font-weight: 700;
     border-radius: 12px;
     cursor: pointer;
@@ -104,6 +120,8 @@ button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 button:hover {
@@ -115,21 +133,28 @@ button:active {
     transform: translateY(0);
 }
 
+/* Updated to span full width at the bottom of the card */
 #startPauseBtn {
     background-color: var(--study-color);
     color: #ffffff;
-    /* White text so the dark pink button stays highly readable */
-    flex: 2;
+    margin-top: 1.5rem;
+    /* Pushes it down below the timer-row */
+    padding: 0.8rem 1.2rem;
+    /* Slightly thicker padding for the primary action */
+    font-size: 1.05rem;
 }
 
 #ffBtn {
-    padding: 0.8rem;
+    padding: 0.5rem;
 }
 
 #ffBtn svg {
     fill: var(--text-color);
 }
 
+/* ==========================================================================
+   4. BACKGROUND MOSAIC DISPLAY CANVAS
+   ========================================================================== */
 #bgCanvas {
     position: fixed;
     top: 0;
@@ -147,41 +172,41 @@ button:active {
     pointer-events: none;
 }
 
-/* Base style for individual background mosaic elements */
 .session-tile {
     width: 100%;
     height: 100%;
     border-radius: 16px;
     opacity: 1.0;
-    /* Force 100% full crisp color visibility */
     background-size: cover;
-    /* Stretches the image to fit the 85x85 box perfectly */
     background-position: center;
     background-repeat: no-repeat;
     transition: transform 0.3s ease;
 }
 
-/* Distinctive tile configurations */
+/* Status variants mapped to local image assets */
 .tile-success {
     background-image: url('frog2.PNG');
-    background-color: transparent;
-    /* Lilypad green backing glow */
 }
 
+/* 2 = Victory Frog */
 .tile-ff {
     background-image: url('frog1.PNG');
-    /* Replace with your path */
-    background-color: transparent;
-    /* Warning yellow tint */
 }
 
+/* 1 = Fast Forwarded */
 .tile-abandoned {
     background-image: url('frog0.PNG');
-    background-color: transparent;
 }
 
+/* 0 = Closed Mid-Session */
 .tile-paused {
     background-image: url('frog3.PNG');
-    background-color: rgba(59, 130, 246, 0.15);
-    border: 2px solid #3b82f6;
+}
+
+/* 3 = Permanent Lilypad Segment */
+
+.tile-extended {
+    background-image: url('frog4.PNG');
+    background-color: transparent;
+    /* Uses your rich pink color as a framing accent */
 }

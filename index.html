@@ -6,6 +6,7 @@
     <title>Pomodoro Study Timer</title>
     <link rel="stylesheet" href="styles.css">
     
+    <link rel="preload" href="frog4.PNG" as="image">
     <link rel="preload" href="frog3.PNG" as="image">
     <link rel="preload" href="frog2.PNG" as="image">
     <link rel="preload" href="frog1.PNG" as="image">
@@ -17,17 +18,22 @@
     <div id="bgCanvas"></div>
 
     <div class="timer-container" id="card">
-        <div id="status" class="study-mode">Study Time</div>
-        <div id="timer">25:00</div>
+        <div id="status" class="study-mode"></div>
         
-        <div class="controls">
-            <button id="startPauseBtn">Start Focus</button>
-            <button id="ffBtn" aria-label="Fast Forward">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30">
-                    <path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/>
-                </svg>
-            </button>
+        <div class="timer-row">
+            <div id="timer">25:00</div>
+            
+            <div class="controls">
+                <button id="addTimeBtn" aria-label="Add 5 Minutes">+5 Min</button>
+                <button id="ffBtn" aria-label="Fast Forward">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                        <path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/>
+                    </svg>
+                </button>
+            </div>
         </div>
+
+        <button id="startPauseBtn">Start</button>
     </div>
 
     <script type="module" src="app.js"></script>

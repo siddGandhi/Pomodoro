@@ -2,8 +2,8 @@
 import { db } from "./firebase-config.js";
 import { collection, doc, setDoc, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
-const STUDY_TIME = 0.1 * 60; // 6 seconds for quick testing
-const BREAK_TIME = 5 * 60;
+const STUDY_TIME = 25 * 60 * 1000; // 6 seconds for quick testing
+const BREAK_TIME = 5 * 60 * 1000;
 
 let timeLeft = STUDY_TIME;
 let timerId = null;
@@ -36,7 +36,8 @@ function renderTileToBackground(statusValue) {
     if (statusValue === 2) tile.classList.add('tile-success');
     else if (statusValue === 1) tile.classList.add('tile-ff');
     else if (statusValue === 0) tile.classList.add('tile-abandoned');
-    else if (statusValue === 3) tile.classList.add('tile-paused'); // Added for pause status
+    else if (statusValue === 3) tile.classList.add('tile-paused');
+    else if (statusValue === 4) tile.classList.add('tile-extended'); // Added for +5 min tracking
 
     bgCanvas.appendChild(tile);
 }
@@ -131,15 +132,24 @@ function startTimer() {
     isRunning = true;
     startPauseBtn.textContent = "Pause";
 
+    // CRITICAL: Run the interval every 10ms instead of 1000ms
     timerId = setInterval(async () => {
-        timeLeft--;
+        timeLeft -= 10; // Subtract 10 milliseconds every tick
         updateDisplay();
 
         if (timeLeft <= 0) {
             clearInterval(timerId);
+            timerId = null;
+            timeLeft = 0; // Lock at absolute zero
+            updateDisplay();
 
             if (isStudyMode) {
                 startAlarmSound(440);
+
+                // Set a 10-second timer to automatically silence the beep
+                setTimeout(() => {
+                    stopAlarmSound();
+                }, 10000);
 
                 const finishedSessionId = currentSessionId;
                 currentSessionId = null;
@@ -157,18 +167,41 @@ function startTimer() {
                 prepareNextMode();
             }
         }
-    }, 1000);
+    }, 10); // 10ms loop speed
 }
+
+// Update the extension listener to work with millisecond scaling
+addTimeBtn.addEventListener('click', async () => {
+    timeLeft += 5 * 60 * 1000; // Add 5 minutes in milliseconds
+    updateDisplay(); // Refresh the numbers on screen immediately
+
+    // If we are expanding an active study block, log a permanent extension tile
+    if (isStudyMode && currentSessionId) {
+        try {
+            // Create a unique sub-id so multiple extensions don't overwrite each other
+            const extensionSnapshotId = `${currentSessionId}_extend_${Date.now()}`;
+            await logSessionEvent(4, extensionSnapshotId);
+            await loadDailyGrid();
+        } catch (err) {
+            console.error("Failed to log extension status to Firebase:", err);
+        }
+    }
+});
 
 async function pauseTimer() {
     isRunning = false;
     clearInterval(timerId);
     startPauseBtn.textContent = isStudyMode ? "Start Focus" : "Start Rest";
 
-    // NEW LOGIC: If we are pausing an active study block, log it as status 3
     if (isStudyMode && currentSessionId) {
         try {
+            // 1. Lock in this specific stretch as a permanent pause tile
             await logSessionEvent(3, currentSessionId);
+
+            // 2. Clear the variable so startTimer() is forced to make a brand new record next time
+            currentSessionId = null;
+
+            // 3. Refresh the pond view
             await loadDailyGrid();
         } catch (err) {
             console.error("Failed to log pause status to Firebase:", err);
@@ -187,6 +220,12 @@ ffBtn.addEventListener('click', () => {
 });
 
 function prepareNextMode() {
+    // Clear any dangling intervals just to be absolutely bulletproof
+    if (timerId) {
+        clearInterval(timerId);
+        timerId = null;
+    }
+
     isStudyMode = !isStudyMode;
     timeLeft = isStudyMode ? STUDY_TIME : BREAK_TIME;
 
@@ -202,14 +241,18 @@ function prepareNextMode() {
         startPauseBtn.textContent = "Start Rest";
     }
     isRunning = false;
-    clearInterval(timerId);
     updateDisplay();
 }
 
 function updateDisplay() {
-    const minutes = Math.floor(timeLeft / 60);
-    const seconds = timeLeft % 60;
-    timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    // Math breakdown from total milliseconds
+    const minutes = Math.floor(timeLeft / (60 * 1000));
+    const seconds = Math.floor((timeLeft % (60 * 1000)) / 1000);
+    const milliseconds = Math.floor((timeLeft % 1000) / 10); // Get two-digit centiseconds
+
+    // Format: MM:SS.mm
+    timerDisplay.textContent =
+        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(2, '0')}`;
 }
 
 startPauseBtn.addEventListener('click', () => {
